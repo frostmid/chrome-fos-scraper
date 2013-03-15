@@ -51,5 +51,5 @@
 		}
 	);
 
-	console.log ('listening for scraper commands');
+	// console.log ('listening for scraper commands');
 }) ();

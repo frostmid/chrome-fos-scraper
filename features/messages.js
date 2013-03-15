@@ -18,13 +18,14 @@ define (['libs/scraper', 'libs/q'], function (Scraper, Q) {
 			})
 
 			.then (function () {
-				var queue = [task.url], index = 0;
+				var	queue = [task.url],
+					index = 0;
 
-				var fetch = function () {
+				var	fetch = function () {
 					if (queue.length <= index) {
 						return;
 					}
-					
+
 					return scraper.createTab (queue [index++])
 						.then (function (tab) {
 							return Q.all ([

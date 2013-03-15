@@ -1,0 +1,28 @@
+{
+	"name": "Futurios scraper",
+	"version": "1.0",
+	"manifest_version": 2,
+	"description": "Futurios web scraper worker",
+	"background": {
+		"persistent": true,
+		"scripts": [
+			"libs/requirejs.js",
+			"background/index.js"
+		]
+	},
+
+	"content_scripts": [{
+		"matches": ["http://*/*"],
+		"js": [
+			"libs/jquery.js",
+			"libs/q.js",
+			"libs/underscore.js",
+			"content/index.js"
+		],
+		"css": []
+	}],
+	"permissions": [
+		"tabs", "http://*/*",
+		"notifications"
+	]
+}

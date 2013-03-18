@@ -22,9 +22,10 @@ define (['libs/scraper', 'libs/q'], function (Scraper, Q) {
 			})
 
 			.then (function (tab) {
-				return scraper.exec ('explain', tab)
-					.then (emitter)
+				return scraper.exec ('explain', tab);
 			})
+
+			.then (emitter)
 
 			.fin (function () {
 				return scraper.closeWindow ();

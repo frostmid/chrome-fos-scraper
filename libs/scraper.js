@@ -27,6 +27,10 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 		},
 
 		exec: function (key, tab) {
+			if (!this.bridge [key]) {
+				throw new Error ('Bridge #' + this.bridge + ' has no key ' + key);
+			}
+
 			return this.runInTab (tab.id, {
 				params: [this.task],
 				source: this.bridge [key]

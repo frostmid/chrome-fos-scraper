@@ -17,6 +17,7 @@
 			"libs/jquery.js",
 			"libs/q.js",
 			"libs/underscore.js",
+			"libs/moment.js",
 			"content/index.js"
 		],
 		"css": []

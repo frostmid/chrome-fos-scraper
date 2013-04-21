@@ -38,7 +38,6 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 		},
 
 		error: function (error) {
-			this.socket = null;
 			this._error.call (this, error);
 		},
 
@@ -55,7 +54,6 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 
 		disconnected: function (error) {
 			console.error ('Disconnected from master');
-			this.socket = null;
 		},
 
 		disconnect: function () {

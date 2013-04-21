@@ -23,7 +23,12 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 			
 			console.log ('Connecting to master', url);
 
-			(this.socket = io.connect (url))
+			(this.socket = io.connect (url, {
+				'try multiple transports': false,
+				'reconnect': true,
+				'max reconnection attempts': Infinity,
+				'sync disconnect on unload': true
+			}))
 				.on ('connect', _.bind (this.connected, this))
 				.on ('disconnect', _.bind (this.disconnected, this))
 				.on ('error', _.bind (this.error, this))

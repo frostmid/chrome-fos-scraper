@@ -57,6 +57,11 @@ define (['libs/scraper', 'libs/q'], function (Scraper, Q) {
 									return scraper.closeTab (tab);
 								});
 						})
+						.then (function () {
+							var deferred = Q.defer ();
+							setTimeout (deferred.resolve, 1000);
+							return deferred.promise;
+						})
 						.then (fetch);
 				};
 

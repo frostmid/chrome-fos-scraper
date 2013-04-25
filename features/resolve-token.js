@@ -13,7 +13,7 @@ define (['libs/scraper', 'libs/q'], function (Scraper, Q) {
 			.then (function (tab) {
 				return scraper.exec ('check-site', tab)
 					.then (function () {
-						if (task ['require-authorization']) {
+						if (task ['token']) {
 							return scraper.exec ('is-authorized', tab)
 								.then (function (authorized) {
 									if (!authorized) {
@@ -24,15 +24,30 @@ define (['libs/scraper', 'libs/q'], function (Scraper, Q) {
 						} else {
 							return true;
 						}
+					})
+					.then (function () {
+						return tab;
 					});
 			})
 
-			.then (function () {
-				return scraper.createTab (task.url);
+			.then (function (tab) {
+				return scraper.exec ('resolve-token', tab);
+			})
+
+			.then (function (url) {
+				return scraper.createTab (url);
 			})
 
 			.then (function (tab) {
 				return scraper.exec ('explain', tab);
+			})
+
+			.then (function (entry) {
+				entry.tokens = [
+					task._prefetch.token._id
+				];
+
+				return entry;
 			})
 
 			.then (emitter)

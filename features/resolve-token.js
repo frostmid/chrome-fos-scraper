@@ -56,6 +56,10 @@ define (['libs/scraper', 'libs/q'], function (Scraper, Q) {
 
 			.then (emitter)
 
+			.fail (function (error) {
+				console.log ('error', error);
+			})
+
 			.fin (function () {
 				return scraper.closeWindow ();
 			});

@@ -45,7 +45,7 @@ define (['libs/scraper', 'libs/q'], function (Scraper, Q) {
 			})
 
 			.then (emitter)
-
+			
 			.fin (function () {
 				return scraper.closeWindow ();
 			});

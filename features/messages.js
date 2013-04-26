@@ -20,6 +20,9 @@ define (['libs/scraper', 'libs/q'], function (Scraper, Q) {
 										return scraper.exec ('authorize', tab)
 											.then (authorizeDelay);
 									}
+								})
+								.then (function (authorized) {
+									throw new Error ('Authorization failed');
 								});
 						} else {
 							return true;

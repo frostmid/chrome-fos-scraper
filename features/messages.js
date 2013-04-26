@@ -18,11 +18,17 @@ define (['libs/scraper', 'libs/q'], function (Scraper, Q) {
 								.then (function (authorized) {
 									if (!authorized) {
 										return scraper.exec ('authorize', tab)
-											.then (authorizeDelay);
+											.then (authorizeDelay)
+
+											.then (function () {
+												return scraper.exec ('is-authorized', tab);
+											})
+											.then (function (authorized) {
+												if (!authorized) {
+													throw new Error ('Authorization failed');
+												}
+											});
 									}
-								})
-								.then (function (authorized) {
-									throw new Error ('Authorization failed');
 								});
 						} else {
 							return true;

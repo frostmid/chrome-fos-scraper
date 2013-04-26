@@ -13,17 +13,21 @@ define (['libs/scraper', 'libs/q'], function (Scraper, Q) {
 			.then (function (tab) {
 				return scraper.exec ('check-site', tab)
 					.then (function () {
-						if (task ['token']) {
-							return scraper.exec ('is-authorized', tab)
-								.then (function (authorized) {
-									if (!authorized) {
-										return scraper.exec ('authorize', tab)
-											.then (authorizeDelay);
-									}
-								});
-						} else {
-							return true;
-						}
+						return scraper.exec ('is-authorized', tab)
+							.then (function (authorized) {
+								if (!authorized) {
+									return scraper.exec ('authorize', tab)
+										.then (authorizeDelay);
+								}
+							});
+					})
+					.then (function () {
+						return scraper.exec ('is-authorized', tab)
+							.then (function (authorized) {
+								if (!authorized) {
+									throw new Error ('Authorization failed');
+								}
+							})
 					})
 					.then (function () {
 						return tab;

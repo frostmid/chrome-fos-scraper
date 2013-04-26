@@ -1,4 +1,4 @@
-require (['libs/slave', 'features/messages', 'features/explain', 'features/resolve-token', 'libs/socket.io'], function (Slave, scrapeMessages, scrapeUrl, resolveToken) {
+require (['libs/slave', 'features/messages', 'features/explain', 'features/resolve-token', 'features/private-messages', 'libs/socket.io'], function (Slave, scrapeMessages, scrapeUrl, resolveToken, scrapePrivateMessages) {
 	// var url = 'http://89.179.119.16:8001';
 	// var url = 'http://127.0.0.1:8001';
 	var url = 'http://89.179.119.16:8001';
@@ -7,6 +7,7 @@ require (['libs/slave', 'features/messages', 'features/explain', 'features/resol
 		.use ('urn:fos:sync:feature/cf6681b2f294c4a7a648ed2bf196df4c', scrapeMessages)
 		.use ('urn:fos:sync:feature/01c4b1eacc107b8de1d977d95a523986', scrapeUrl)
 		.use ('urn:fos:sync:feature/fd15698a8ef5c786f830221f0cdfc92e', resolveToken)
+		.use ('urn:fos:sync:feature/0c9d7b33dec4872ab03788a0ffe20792', scrapePrivateMessages)
 
 		.fail (function (error) {
 			console.error ('Could not connect to master');

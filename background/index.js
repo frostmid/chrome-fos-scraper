@@ -1,6 +1,7 @@
 require (['libs/slave', 'features/messages', 'features/explain', 'features/resolve-token', 'libs/socket.io'], function (Slave, scrapeMessages, scrapeUrl, resolveToken) {
 	// var url = 'http://89.179.119.16:8001';
-	var url = 'http://127.0.0.1:8001';
+	// var url = 'http://127.0.0.1:8001';
+	var url = 'http://89.179.119.16:8001';
 
 	(new Slave)
 		.use ('urn:fos:sync:feature/cf6681b2f294c4a7a648ed2bf196df4c', scrapeMessages)

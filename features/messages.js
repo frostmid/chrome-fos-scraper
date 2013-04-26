@@ -13,7 +13,7 @@ define (['libs/scraper', 'libs/q'], function (Scraper, Q) {
 			.then (function (tab) {
 				return scraper.exec ('check-site', tab)
 					.then (function () {
-						if (task ['require-authorization']) {
+						if (task ['token']) {
 							return scraper.exec ('is-authorized', tab)
 								.then (function (authorized) {
 									if (!authorized) {

@@ -66,10 +66,15 @@ define (['libs/scraper', 'libs/q'], function (Scraper, Q) {
 									return scraper.closeTab (tab);
 								});
 						})
-						.then (function () {
+						.then (function (value) {
 							var deferred = Q.defer ();
-							setTimeout (deferred.resolve, 3000);
+							setTimeout (function () {
+								deferred.resolve (value);
+							}, 3000);
 							return deferred.promise;
+						})
+						.fail (function (error) {
+							console.error ('fetch failed', error);
 						})
 						.then (fetch);
 				};

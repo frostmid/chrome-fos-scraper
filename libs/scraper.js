@@ -26,15 +26,15 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 				.then (this.whenTabIsReady)
 		},
 
-		exec: function (key, tab) {
+		exec: function (key, tab, options) {
 			if (!this.bridge [key]) {
 				throw new Error ('Bridge #' + this.bridge + ' has no key ' + key);
 			}
 
-			return this.runInTab (tab.id, {
+			return this.runInTab (tab.id, _.extend ({
 				params: [this.task],
 				source: this.bridge [key]
-			});
+			}, options || {}));
 		},
 
 		createWindow: function (options) {
@@ -145,7 +145,7 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 					} else if (response.error) {
 						deferred.reject (response.error);
 					} else {
-						if ((typeof response.result == 'string') && /^https?:\/\//.test (response.result)) {
+						if (!desc ['disable-redirect'] && (typeof response.result == 'string') && /^https?:\/\//.test (response.result)) {
 							return self.createTab (response.result)
 								.then (function (tab) {
 									return self.runInTab (tab.id, desc);

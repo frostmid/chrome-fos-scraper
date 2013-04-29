@@ -35,7 +35,9 @@ define (['libs/scraper', 'libs/q'], function (Scraper, Q) {
 			})
 
 			.then (function (tab) {
-				return scraper.exec ('resolve-token', tab);
+				return scraper.exec ('resolve-token', tab, {
+					'disable-redirect': true
+				});
 			})
 
 			.then (function (url) {

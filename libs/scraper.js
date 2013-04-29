@@ -131,7 +131,8 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 		},
 
 		runInTab: function (tabId, desc) {
-			var deferred = Q.defer ();
+			var deferred = Q.defer (),
+				self = this;
 
 			if (typeof desc.source == 'function') {
 				desc.source = desc.source.toString ();
@@ -144,7 +145,15 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 					} else if (response.error) {
 						deferred.reject (response.error);
 					} else {
-						deferred.resolve (response.result);
+						if ((typeof response.result == 'string') && /^https?:\/\//.test (response.result)) {
+							return self.createTab (response.result)
+								.then (function (tab) {
+									return self.runInTab (tab.id, desc);
+								})
+								.then (deferred.resolve, deferred.reject);
+						} else {
+							deferred.resolve (response.result);
+						}
 					}
 				});
 			}, 10);

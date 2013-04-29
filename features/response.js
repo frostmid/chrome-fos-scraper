@@ -1,10 +1,4 @@
 define (['libs/scraper', 'libs/q', 'features/private-messages'], function (Scraper, Q, scrapePrivateMessages) {
-	var authorizeDelay = function () {
-		var deferred = Q.defer ();
-		setTimeout (deferred.resolve, 5 * 1000);
-		return deferred.promise;
-	};
-
 	return function (task) {
 		var self = this,
 			emitter = this.emitter (task),
@@ -19,8 +13,6 @@ define (['libs/scraper', 'libs/q', 'features/private-messages'], function (Scrap
 								.then (function (authorized) {
 									if (!authorized) {
 										return scraper.exec ('authorize', tab)
-											.then (authorizeDelay)
-
 											.then (function () {
 												return scraper.exec ('is-authorized', tab);
 											})

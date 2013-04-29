@@ -31,7 +31,7 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 				throw new Error ('Bridge #' + this.bridge + ' has no key ' + key);
 			}
 
-			return this.runInTab (tab.id, _.extend ({
+			return this.runInTab (tab, _.extend ({
 				params: [this.task],
 				source: this.bridge [key]
 			}, options || {}));
@@ -130,7 +130,7 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 			return deferred.promise;
 		},
 
-		runInTab: function (tabId, desc) {
+		runInTab: function (tab, desc) {
 			var deferred = Q.defer (),
 				self = this;
 
@@ -139,21 +139,26 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 			}
 
 			_.delay (function () {
-				chrome.tabs.sendMessage (tabId, desc, function (response) {
+				chrome.tabs.sendMessage (tab.id, desc, function (response) {
 					if (!response) {
 						deferred.reject ('null response from chrome tab');
 					} else if (response.error) {
 						deferred.reject (response.error);
 					} else {
-						if (!desc ['disable-redirect'] && (typeof response.result == 'string') && /^https?:\/\//.test (response.result)) {
-							return self.createTab (response.result)
-								.then (function (tab) {
-									return self.runInTab (tab.id, desc);
-								})
-								.then (deferred.resolve, deferred.reject);
-						} else {
-							deferred.resolve (response.result);
-						}
+						self.whenTabIsReady (tab)
+							.then (function () {
+								if (!desc ['disable-redirect'] && (typeof response.result == 'string') && /^https?:\/\//.test (response.result)) {
+									return self.createTab (response.result)
+										.then (function (tab) {
+											return self.runInTab (tab, desc);
+										})
+										.then (deferred.resolve, deferred.reject);
+								} else {
+									deferred.resolve (response.result);
+								}
+							})
+							.fail (deferred.reject)
+							.done ();
 					}
 				});
 			}, 10);

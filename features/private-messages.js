@@ -58,7 +58,7 @@ define (['libs/scraper', 'libs/q'], function (Scraper, Q) {
 							var deferred = Q.defer ();
 							setTimeout (function () {
 								deferred.resolve (value);
-							}, 3000);
+							}, 50);
 							return deferred.promise;
 						})
 						.fail (function (error) {

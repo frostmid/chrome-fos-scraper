@@ -130,6 +130,14 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 			return deferred.promise;
 		},
 
+		redirectTab: function (tab, url) {
+			chrome.tabs.update (tab.id, {
+				url: url
+			});
+
+			return Q.resolve (tab);
+		},
+
 		runInTab: function (tab, desc) {
 			var deferred = Q.defer (),
 				self = this;
@@ -148,7 +156,7 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 						self.whenTabIsReady (tab)
 							.then (function () {
 								if (!desc ['disable-redirect'] && (typeof response.result == 'string') && /^https?:\/\//.test (response.result)) {
-									return self.createTab (response.result)
+									return self.redirectTab (tab, response.result)
 										.then (function (tab) {
 											return self.runInTab (tab, desc);
 										})

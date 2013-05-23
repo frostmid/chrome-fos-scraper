@@ -11,6 +11,8 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 		features: null,
 		currentStatus: 'free',
 		retry: 1000,
+		tasks: 0,
+		maxTasks: 10,
 
 		_error: function (error) {
 			console.error ('Error', error);
@@ -87,6 +89,11 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 
 		handle: function (task) {
 			console.log ('Processing task', task._id);
+			if (++this.tasks > this.maxTasks) {
+				this.status ('busy');
+			}
+
+
 			
 			var self = this;
 
@@ -110,6 +117,13 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 						error: error.message || error
 					});
 				}, this))
+
+				.fin (function () {
+					--self.tasks;
+					if (self.currentStatus == 'busy') {
+						self.status ('free');
+					}
+				})
 
 				.done ();
 		},

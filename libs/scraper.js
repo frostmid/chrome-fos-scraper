@@ -155,7 +155,7 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 					} else {
 						self.whenTabIsReady (tab)
 							.then (function () {
-								if ((typeof response.result.redirect == 'object') && response.result.redirect) {
+								if ((typeof response.result == 'object') && response.result.redirect) {
 									return self.redirectTab (tab, response.result.redirect)
 										.then (function (tab) {
 											return self.runInTab (tab, desc);

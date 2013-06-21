@@ -155,7 +155,13 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 					} else {
 						self.whenTabIsReady (tab)
 							.then (function () {
-								if (!desc ['disable-redirect'] && (typeof response.result == 'string') && /^https?:\/\//.test (response.result)) {
+								if (typeof response.result == 'object' && response.result.redirect) {
+									return self.redirectTab (tab, response.result.redirect)
+										.then (function (tab) {
+											return self.runInTab (tab, desc);
+										})
+										.then (deferred.resolve, deferred.reject);
+								} else if (!desc ['disable-redirect'] && (typeof response.result == 'string') && /^https?:\/\//.test (response.result)) {
 									return self.redirectTab (tab, response.result)
 										.then (function (tab) {
 											return self.runInTab (tab, desc);

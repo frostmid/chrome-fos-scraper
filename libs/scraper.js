@@ -31,10 +31,13 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 				throw new Error ('Bridge #' + this.bridge + ' has no key ' + key);
 			}
 
-			return this.runInTab (tab, _.extend ({
-				params: [this.task],
-				source: this.bridge [key]
-			}, options || {}));
+			return this.whenTabIsReady (tab)
+				.then (_.bind (function () {
+					return this.runInTab (tab, _.extend ({
+						params: [this.task],
+						source: this.bridge [key]
+					}, options || {}));
+				}, this));
 		},
 
 		createWindow: function (options) {

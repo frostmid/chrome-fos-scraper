@@ -69,7 +69,8 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 			if (this.socket) {
 				this.socket.emit ('settings', {
 					features: _.keys (this.features),
-					status: this.currentStatus
+					status: this.currentStatus,
+					version: '0.0.1'
 				});
 			}
 		},

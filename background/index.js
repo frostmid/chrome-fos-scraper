@@ -12,13 +12,12 @@ require (['libs/slave', 'features/messages', 'features/explain', 'features/resol
 		.use ('urn:fos:sync:feature/43d8ef1b4a646e2f9f955f4964959565', response)
 
 		.fail (function (error) {
-			console.error ('Could not connect to master');
+			console.error ('Could not connect to master', error);
 
-			var reconnect = _.bind (function () {
-				window.location.reload ();
-			}, this);
-			
-			_.delay (reconnect, 5 * 1000);
+			_.delay (
+				_.bind (window.location.reload, window.location),
+				5 * 1000
+			);
 		})
 
 		.connect (io, url);

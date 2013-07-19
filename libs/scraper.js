@@ -5,6 +5,7 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 		this.token = task._prefetch.token;
 		this.feature = task._prefetch.feature;
 		this.whenTabIsReady = _.bind (this.whenTabIsReady, this);
+		this.timeout = 10 * 1000;	// 15 secs timeout
 	}
 
 	_.extend (Scraper.prototype, {
@@ -31,13 +32,34 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 				throw new Error ('Bridge #' + this.bridge + ' has no key ' + key);
 			}
 
-			return this.whenTabIsReady (tab)
+			var deferred = Q.defer (),
+				timeout, timeouted;
+
+			timeout = setTimeout (function () {
+				timeouted = true;
+				deferred.reject ('tab timeout');
+			}, this.timeout);
+
+			this.whenTabIsReady (tab)
 				.then (_.bind (function () {
-					return this.runInTab (tab, _.extend ({
-						params: [this.task],
-						source: this.bridge [key]
-					}, options || {}));
-				}, this));
+					if (!timeouted)
+						return this.runInTab (tab, _.extend ({
+							params: [this.task],
+							source: this.bridge [key]
+						}, options || {}));
+				}, this))
+				.then (function (result) {
+					if (!timeouted) {
+						clearTimeout (timeout);
+						deferred.resolve (result);
+					}
+				})
+				.fail (function (error) {
+					deferred.reject (new Error ('Tab exec timed out'));
+				})
+				.done ();
+
+			return deferred.promise;
 		},
 
 		createWindow: function (options) {

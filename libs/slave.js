@@ -64,10 +64,6 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 			if (this.socket) {
 				this.socket.disconnect ();
 				this.socket = null;
-				
-				if (typeof window !== 'undefined') {
-					window.location.reload ();
-				}
 			}
 		},
 

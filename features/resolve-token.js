@@ -53,6 +53,7 @@ define (['libs/scraper', 'libs/q'], function (Scraper, Q) {
 
 			.fail (function (error) {
 				console.log ('error', error);
+				throw error;
 			})
 
 			.fin (function () {

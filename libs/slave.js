@@ -1,8 +1,9 @@
 define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
-	function Slave () {
+	function Slave (info) {
 		this.features = {};
 
 		this.emit = _.bind (this.emit, this);
+		this.info = info || null;
 	};
 
 	_.extend (Slave.prototype, events.EventEmitter.prototype, {
@@ -13,6 +14,7 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 		retry: 1000,
 		tasks: 0,
 		maxTasks: 1,
+		info: null,
 
 		_error: function (error) {
 			console.error ('Error', error);
@@ -70,7 +72,7 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 				this.socket.emit ('settings', {
 					features: _.keys (this.features),
 					status: this.currentStatus,
-					version: '0.0.1'
+					info: this.info
 				});
 			}
 		},

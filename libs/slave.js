@@ -12,7 +12,7 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 		currentStatus: 'free',
 		retry: 1000,
 		tasks: 0,
-		maxTasks: 10,
+		maxTasks: 1,
 
 		_error: function (error) {
 			console.error ('Error', error);

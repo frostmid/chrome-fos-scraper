@@ -2,9 +2,10 @@ require (['libs/slave', 'features/messages', 'features/explain', 'features/resol
 	var url = 'http://89.179.119.16:8001';
 
 	(new Slave ({
-		title: 'web scraper',
-		version: '0.0.1',
-		'max-tasks': 10
+		'title': 'web scraper',
+		'version': '0.0.1',
+		'max-tasks': 10,
+		'timeout': 10 * 60	// in seconds
 	}))
 		.use ('urn:fos:sync:feature/cf6681b2f294c4a7a648ed2bf196df4c', scrapeMessages)
 		.use ('urn:fos:sync:feature/01c4b1eacc107b8de1d977d95a523986', scrapeUrl)

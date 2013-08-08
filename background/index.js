@@ -3,8 +3,8 @@ require (['libs/slave', 'features/messages', 'features/explain', 'features/resol
 
 	(new Slave ({
 		'title': 'web scraper',
-		'version': '0.0.1',
-		'max-tasks': 10,
+		'version': '0.0.3',
+		'max-tasks': 5,
 		'timeout': 10 * 60	// in seconds
 	}))
 		.use ('urn:fos:sync:feature/cf6681b2f294c4a7a648ed2bf196df4c', scrapeMessages)

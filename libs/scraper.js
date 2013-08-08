@@ -1,20 +1,39 @@
 define (['libs/q', 'libs/underscore'], function (Q) {
+	var cache = {};
+
 	function Scraper (task) {
+		var key = JSON.stringify (task._prefetch.token);
+
+		// check, if we have open scrapers for given task.token
+		if (cache [key]) {
+			return cache [key];
+		}
+
+		this.key = key;
 		this.task = task;
 		this.bridge = task._prefetch.bridge;
 		this.token = task._prefetch.token;
 		this.feature = task._prefetch.feature;
 		this.whenTabIsReady = _.bind (this.whenTabIsReady, this);
 		this.timeout = 10 * 1000;	// 15 secs timeout
+
+		cache [key] = this;
 	}
 
 	_.extend (Scraper.prototype, {
-		task: null, bridge: null, token: null, feature: null, window: null,
+		key: null, task: null, bridge: null, token: null, feature: null, window: null,
 
 		tabPollingInterval: 100,
+		openedWindowsCount: 0,
 
 		start: function () {
 			var self = this;
+
+			// if windows count > 1, then simply return the first tab
+			if (this.openedWindowsCount) {
+				this.openedWindowsCount += 1;
+				return Q.when (self.getFirstTab ());
+			}
 
 			return this.createWindow ({
 				url: this.bridge ['base-uri'],
@@ -22,9 +41,10 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 			})
 				.then (function (window) {
 					self.window = window;
+					self.openedWindowsCount += 1;
 					return self.getFirstTab ();
 				})
-				.then (this.whenTabIsReady)
+				.then (this.whenTabIsReady);
 		},
 
 		exec: function (key, tab, options) {
@@ -75,15 +95,27 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 		},
 
 		closeWindow: function () {
-			var deferred = Q.defer ();
+			this.openedWindowsCount -= 1;
 
-			try {
-				chrome.windows.remove (this.window.id, deferred.resolve);
-			} catch (e) {
-				deferred.reject (e.message);
+			if (this.openedWindowsCount) {
+				console.log ('Task attempted to to close window, but there are', this.openedWindowsCount, 'tasks using this window');
+				return Q.when (null);
+			} else {
+				console.log ('Close browser window');
+
+				// remove scraper from cache
+				delete cache [this.key];
+
+				var deferred = Q.defer ();
+
+				try {
+					chrome.windows.remove (this.window.id, deferred.resolve);
+				} catch (e) {
+					deferred.reject (e.message);
+				}
+
+				return deferred.promise;	
 			}
-
-			return deferred.promise;
 		},
 
 		createTab: function (url, window) {

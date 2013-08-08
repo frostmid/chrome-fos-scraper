@@ -25,6 +25,7 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 
 		tabPollingInterval: 100,
 		openedWindowsCount: 0,
+		promiseWindow: null,
 
 		start: function () {
 			var self = this;
@@ -32,8 +33,15 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 			// if windows count > 1, then simply return the first tab
 			if (this.openedWindowsCount) {
 				this.openedWindowsCount += 1;
-				return Q.when (self.getFirstTab ());
+				return Q.when (this.promiseWindow)
+					.then (function () {
+						return self.getFirstTab ();
+					});
 			}
+
+			var deferred = Q.defer ();
+			self.openedWindowsCount += 1;
+			this.promiseWindow = deferred.promise;
 
 			return this.createWindow ({
 				url: this.bridge ['base-uri'],
@@ -41,7 +49,7 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 			})
 				.then (function (window) {
 					self.window = window;
-					self.openedWindowsCount += 1;
+					deferred.resolve (window);
 					return self.getFirstTab ();
 				})
 				.then (this.whenTabIsReady);

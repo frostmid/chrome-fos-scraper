@@ -3,7 +3,7 @@ require (['libs/slave', 'features/messages', 'features/explain', 'features/resol
 
 	(new Slave ({
 		'title': 'web scraper',
-		'version': '0.0.3',
+		'version': '0.0.4',
 		'max-tasks': 5,
 		'timeout': 10 * 60	// in seconds
 	}))

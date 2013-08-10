@@ -15,7 +15,7 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 		this.token = task._prefetch.token;
 		this.feature = task._prefetch.feature;
 		this.whenTabIsReady = _.bind (this.whenTabIsReady, this);
-		this.timeout = 10 * 1000;	// 15 secs timeout
+		this.timeout = 60 * 1000;	// 15 secs timeout
 
 		cache [key] = this;
 	}
@@ -65,7 +65,9 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 
 			timeout = setTimeout (function () {
 				timeouted = true;
-				deferred.reject ('tab timeout');
+				deferred.reject (
+					new Error ('Tab exec timed out')
+				);
 			}, this.timeout);
 
 			this.whenTabIsReady (tab)
@@ -83,7 +85,7 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 					}
 				})
 				.fail (function (error) {
-					deferred.reject (new Error ('Tab exec timed out'));
+					deferred.reject (error);
 				})
 				.done ();
 

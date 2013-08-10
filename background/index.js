@@ -1,11 +1,21 @@
 require (['libs/slave', 'features/messages', 'features/explain', 'features/resolve-token', 'features/private-messages', 'features/response', 'libs/socket.io'], function (Slave, scrapeMessages, scrapeUrl, resolveToken, scrapePrivateMessages, response) {
-	var url = 'http://89.179.119.16:8001';
+	var url = 'http://89.179.119.16:8001',
+		restart = function () {
+			_.delay (_.bind (window.location.reload, window.location), 2500);
+		};
+
+	window.onerror = function (error, file, line) {
+		console.error ('Uncaught error', error, 'in file', file, 'on line', line);
+		_.delay (restart, 2500);
+	};
 
 	(new Slave ({
 		'title': 'web scraper',
-		'version': '0.0.4',
+		'version': '0.0.5',
 		'max-tasks': 5,
-		'timeout': 10 * 60	// in seconds
+		'timeout': 10 * 60, // 1 minute
+	}, {
+		'restart': restart
 	}))
 		.use ('urn:fos:sync:feature/cf6681b2f294c4a7a648ed2bf196df4c', scrapeMessages)
 		.use ('urn:fos:sync:feature/01c4b1eacc107b8de1d977d95a523986', scrapeUrl)
@@ -15,11 +25,7 @@ require (['libs/slave', 'features/messages', 'features/explain', 'features/resol
 
 		.fail (function (error) {
 			console.error ('Could not connect to master', error);
-
-			_.delay (
-				_.bind (window.location.reload, window.location),
-				5 * 1000
-			);
+			restart ();
 		})
 
 		.connect (io, url);

@@ -1,9 +1,10 @@
 define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
-	function Slave (info) {
+	function Slave (info, options) {
 		this.features = {};
 
 		this.emit = _.bind (this.emit, this);
 		this.info = info || null;
+		this.options = options || null;
 	};
 
 	_.extend (Slave.prototype, events.EventEmitter.prototype, {
@@ -20,7 +21,17 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 			console.error ('Error', error);
 		},
 
-		connect: function (io, url) {
+
+		connect: function () {
+			try {
+				return this._connect.apply (this, arguments);
+			} catch (e) {
+				console.error ('Connect error', e.message, e.stack);
+				this.restartProcess ();
+			}
+		},
+
+		_connect: function (io, url) {
 			if (this.socket) {
 				throw new Error ('Already connected');
 			}
@@ -43,6 +54,7 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 
 		error: function (error) {
 			this._error.call (this, error);
+			this.restartProcess ();
 		},
 
 		fail: function (callback) {
@@ -57,7 +69,16 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 		},
 
 		disconnected: function (error) {
-			console.error ('Disconnected from master');
+			console.error ('Disconnected from master', error);
+			this.restartProcess ();
+		},
+
+		restartProcess: function () {
+			if (this.options && (typeof this.options.restart == 'function')) {
+				this.options.restart ();
+			} else {
+				console.warn ('Restart function not defined');
+			}
 		},
 
 		disconnect: function () {

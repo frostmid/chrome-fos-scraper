@@ -62,7 +62,7 @@ define (['libs/scraper', 'libs/q'], function (Scraper, Q) {
 							var deferred = Q.defer ();
 							setTimeout (function () {
 								deferred.resolve (value);
-							}, 50);
+							}, 500);
 							return deferred.promise;
 						})
 						.fail (function (error) {

@@ -2,8 +2,9 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 	var cache = {};
 
 	function Scraper (task) {
-		var key = JSON.stringify (task._prefetch.token);
+		var key = task._prefetch.token._id;
 
+		
 		// check, if we have open scrapers for given task.token
 		if (cache [key]) {
 			return cache [key];

@@ -1,5 +1,5 @@
 require (['libs/slave', 'features/messages', 'features/explain', 'features/resolve-token', 'features/private-messages', 'features/response', 'libs/socket.io'], function (Slave, scrapeMessages, scrapeUrl, resolveToken, scrapePrivateMessages, response) {
-	var url = 'http://89.179.119.16:8001',
+	var url = 'http://siab.frossa.ru:8001',
 		restart = function () {
 			_.delay (_.bind (window.location.reload, window.location), 2500);
 		};
@@ -11,7 +11,7 @@ require (['libs/slave', 'features/messages', 'features/explain', 'features/resol
 
 	(new Slave ({
 		'title': 'web scraper',
-		'version': '0.0.5',
+		'version': '0.0.6',
 		'max-tasks': 5,
 		'timeout': 10 * 60, // 1 minute
 	}, {

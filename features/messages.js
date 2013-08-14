@@ -51,24 +51,29 @@ define (['libs/scraper', 'libs/q'], function (Scraper, Q) {
 
 								scraper.exec ('entries', tab)
 									.then (function (entries) {
-										_.each (entries, emitter);
+										return _.map (entries, emitter);
 									})
 							])
 								.then (function () {
 									return scraper.closeTab (tab);
-								});
-						})
-						.then (function (value) {
-							var deferred = Q.defer ();
-							setTimeout (function () {
-								deferred.resolve (value);
-							}, 500);
-							return deferred.promise;
-						})
-						.fail (function (error) {
-							console.error ('fetch failed', error);
-						})
-						.then (fetch);
+								})
+								.fail (function (error) {
+									console.error ('#error', error);
+									return scraper.closeTab (tab);
+								})
+
+								.then (function (value) {
+									var deferred = Q.defer ();
+									setTimeout (function () {
+										deferred.resolve (value);
+									}, 750);
+									return deferred.promise;
+								})
+								.fail (function (error) {
+									console.error ('fetch failed', error);
+								})
+								.then (fetch);
+						});
 				};
 
 				return fetch ();

@@ -13,7 +13,7 @@ require (['libs/slave', 'features/messages', 'features/explain', 'features/resol
 		'title': 'web scraper',
 		'version': '0.0.6',
 		'max-tasks': 5,
-		'timeout': 10 * 60, // 1 minute
+		'timeout': 30 * 60, // seconds
 	}, {
 		'restart': restart
 	}))

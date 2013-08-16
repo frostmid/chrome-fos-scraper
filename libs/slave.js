@@ -113,9 +113,6 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 
 		handle: function (task) {
 			console.log ('Processing task', task._id);
-			if (++this.tasks > this.maxTasks) {
-				this.status ('busy');
-			}
 
 
 			
@@ -144,9 +141,6 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 
 				.fin (function () {
 					--self.tasks;
-					if (self.currentStatus == 'busy') {
-						self.status ('free');
-					}
 				})
 
 				.done ();

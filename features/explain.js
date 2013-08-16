@@ -33,11 +33,13 @@ define (['libs/scraper', 'libs/q'], function (Scraper, Q) {
 			})
 
 			.then (function (tab) {
-				return scraper.exec ('explain', tab);
+				return scraper.exec ('explain', tab)
+					.then (emitter)
+					.fin (function () {
+						return scraper.closeTab (tab);
+					});
 			})
 
-			.then (emitter)
-			
 			.fin (function () {
 				return scraper.closeWindow ();
 			});

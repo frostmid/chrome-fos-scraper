@@ -14,13 +14,12 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 		currentStatus: 'free',
 		retry: 1000,
 		tasks: 0,
-		maxTasks: 1,
-		info: null,
+		maxTasks: 10,
+		cancellers: {},
 
 		_error: function (error) {
 			console.error ('Error', error);
 		},
-
 
 		connect: function () {
 			try {
@@ -39,27 +38,28 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 			console.log ('Connecting to master', url);
 
 			(this.socket = io.connect (url, {
-				'try multiple transports': false,
-				'reconnect': true,
-				'max reconnection attempts': Infinity,
-				'sync disconnect on unload': true
-			}))
+					'try multiple transports': false,
+					'reconnect': true,
+					'max reconnection attempts': Infinity,
+					'sync disconnect on unload': true
+				}))
 				.on ('connect', _.bind (this.connected, this))
 				.on ('disconnect', _.bind (this.disconnected, this))
 				.on ('error', _.bind (this.error, this))
-				.on ('task', _.bind (this.handle, this));
+				.on ('task', _.bind (this.handle, this))
+				.on ('cancel', _.bind (this.cancel, this));
 
 			return this;
 		},
 
 		error: function (error) {
+			this.socket = null;
 			this._error.call (this, error);
 			this.restartProcess ();
 		},
 
 		fail: function (callback) {
 			this._error = callback;
-
 			return this;
 		},
 
@@ -69,8 +69,15 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 		},
 
 		disconnected: function (error) {
-			console.error ('Disconnected from master', error);
+			console.error ('Disconnected from master');
 			this.restartProcess ();
+		},
+
+		disconnect: function () {
+			if (this.socket) {
+				this.socket.disconnect ();
+				this.socket = null;
+			}
 		},
 
 		restartProcess: function () {
@@ -78,13 +85,6 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 				this.options.restart ();
 			} else {
 				console.warn ('Restart function not defined');
-			}
-		},
-
-		disconnect: function () {
-			if (this.socket) {
-				this.socket.disconnect ();
-				this.socket = null;
 			}
 		},
 
@@ -114,8 +114,10 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 		handle: function (task) {
 			console.log ('Processing task', task._id);
 
+			if (++this.tasks > this.maxTasks) {
+				this.status ('busy');
+			}
 
-			
 			var self = this;
 
 			Q.when (this.feature (task.feature))
@@ -134,6 +136,8 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 				.fail (_.bind (function (error) {
 					console.log ('Task failed', task._id, error);
 
+					--self.tasks;
+
 					this.socket.emit (task._id, {
 						error: error.message || error
 					});
@@ -141,9 +145,23 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 
 				.fin (function () {
 					--self.tasks;
+					if (self.currentStatus == 'busy') {
+						self.status ('free');
+					}
 				})
 
 				.done ();
+		},
+
+		cancel: function (taskId) {
+			if (typeof this.cancellers [taskId] == 'function') {
+				this.cancellers [taskId] ();
+				delete this.cancellers [taskId];
+			}
+		},
+
+		onCancel: function (taskId, callback) {
+			return this.cancellers [taskId] = callback;
 		},
 
 		feature: function (feature) {
@@ -162,11 +180,26 @@ define (['libs/q', 'libs/events', 'libs/underscore'], function (Q, events) {
 		},
 
 		emitter: function (task) {
-			return _.bind (function (entry) {
-				this.socket.emit (task._id, {
-					entry: entry
-				});
-			}, this);
+			var self = this;
+			
+			return function (entry) {
+				if (entry instanceof Error) {
+					return self.socket.emit (task._id, {
+						warning: entry.message
+					});
+				}
+
+				return Q.when (entry)
+					.then (function (entry) {
+						self.socket.emit (task._id, {
+							entry: entry
+						});
+					})
+					.fail (function (error) {
+						console.error ('Failed to emit normalized entry', error);
+					});
+				
+			};
 		}
 	});
 

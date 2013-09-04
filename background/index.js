@@ -1,6 +1,18 @@
 require (['libs/slave', 'features/messages', 'features/explain', 'features/resolve-token', 'features/private-messages', 'features/response', 'libs/socket.io'], function (Slave, scrapeMessages, scrapeUrl, resolveToken, scrapePrivateMessages, response) {
 	var url = 'http://siab.frossa.ru:8001',
 		restart = function () {
+			chrome.windows.getAll (function (windows) {
+				for (var i = 0; i < windows.length; i++) {
+					var window = windows [i];
+					
+					if (window.type == 'normal' && window.incognito) {
+						chrome.windows.remove (window.id, function () {
+							console.log ('Closed window', window.id);
+						});
+					}
+				}
+			});
+
 			_.delay (_.bind (window.location.reload, window.location), 2500);
 		};
 
@@ -11,7 +23,7 @@ require (['libs/slave', 'features/messages', 'features/explain', 'features/resol
 
 	(new Slave ({
 		'title': 'web scraper',
-		'version': '0.0.6',
+		'version': '0.0.7',
 		'max-tasks': 5,
 		'timeout': 30 * 60, // seconds
 	}, {

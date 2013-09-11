@@ -2,7 +2,13 @@ define (['libs/scraper', 'libs/q', 'features/private-messages'], function (Scrap
 	return function (task) {
 		var self = this,
 			emitter = this.emitter (task),
-			scraper = new Scraper (task);
+			scraper = new Scraper (task),
+			cancelled = false;
+
+		this.onCancel (task._id, function () {
+			cancelled = true;
+			scraper.closeWindow ();
+		});
 
 		return scraper.start ()
 			.then (function (tab) {
@@ -49,8 +55,16 @@ define (['libs/scraper', 'libs/q', 'features/private-messages'], function (Scrap
 				return deferred.promise;
 			})
 
+			.fail (function (error) {
+				if (!cancelled) {
+					return Q.reject (error);
+				}
+			})
+
 			.fin (function () {
-				return scraper.closeWindow ();
+				if (!cancelled) {
+					return scraper.closeWindow ();
+				}
 			});
 	};
 });

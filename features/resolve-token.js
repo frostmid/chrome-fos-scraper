@@ -1,7 +1,13 @@
 define (['libs/scraper', 'libs/q'], function (Scraper, Q) {
 	return function (task) {
 		var emitter = this.emitter (task),
-			scraper = new Scraper (task);
+			scraper = new Scraper (task),
+			cancelled = false;
+
+		this.onCancel (task._id, function () {
+			cancelled = true;
+			scraper.closeWindow ();
+		});
 		
 		return scraper.start ()
 			.then (function (tab) {
@@ -52,12 +58,15 @@ define (['libs/scraper', 'libs/q'], function (Scraper, Q) {
 			.then (emitter)
 
 			.fail (function (error) {
-				console.log ('error', error);
-				throw error;
+				if (!cancelled) {
+					return Q.reject (error);
+				}
 			})
-
+			
 			.fin (function () {
-				return scraper.closeWindow ();
+				if (!cancelled) {
+					return scraper.closeWindow ();
+				}
 			});
 	};
 });

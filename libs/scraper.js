@@ -49,9 +49,13 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 				incognito: true
 			})
 				.then (function (window) {
-					self.window = window;
-					deferred.resolve (window);
-					return self.getFirstTab ();
+					if (window) {
+						self.window = window;
+						deferred.resolve (window);
+						return self.getFirstTab ();
+					} else {
+						return Promises.reject ('Probably "allow in incognito" option is not set');
+					}
 				})
 				.then (this.whenTabIsReady);
 		},

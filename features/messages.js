@@ -57,7 +57,11 @@ define (['libs/scraper', 'libs/q'], function (Scraper, Q) {
 
 								scraper.exec ('entries', tab)
 									.then (function (entries) {
-										return _.map (entries, emitter);
+										return _.map (
+											_.filter (entries, function (entry) {
+												return (entry.created_at * 1000) >= task ['scrape-start'];
+											}),
+											emitter);
 									})
 							])
 								.then (function () {

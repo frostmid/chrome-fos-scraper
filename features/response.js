@@ -47,6 +47,9 @@ define (['libs/scraper', 'libs/q', 'features/private-messages'], function (Scrap
 				var deferred = Q.defer ();
 
 				require ([depency], function (feature) {
+					var subTask = _.clone (task);
+					subTask ['scrape-start'] = subTask ['previous-poll'] = null;
+
 					feature.call (self, task)
 						.then (deferred.resolve, deferred.reject)
 						.done ();

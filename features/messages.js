@@ -59,7 +59,7 @@ define (['libs/scraper', 'libs/q'], function (Scraper, Q) {
 									.then (function (entries) {
 										return _.map (
 											_.filter (entries, function (entry) {
-												return (entry.created_at * 1000) >= task ['scrape-start'];
+												return (entry.created_at * 1000) >= (task ['previous-poll'] || task ['scrape-start']);
 											}),
 											emitter);
 									})

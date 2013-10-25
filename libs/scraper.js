@@ -44,8 +44,14 @@ define (['libs/q', 'libs/underscore'], function (Q) {
 			self.openedWindowsCount += 1;
 			this.promiseWindow = deferred.promise;
 
+			var baseUri = this.bridge ['base-uri'];
+
+			if (/banki\.ru/.test (baseUri)) {
+				baseUri += '/?modern=0';
+			}
+
 			return this.createWindow ({
-				url: this.bridge ['base-uri'],
+				url: baseUri,
 				incognito: true
 			})
 				.then (function (window) {
